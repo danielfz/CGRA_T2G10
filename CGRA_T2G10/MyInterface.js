@@ -28,26 +28,27 @@ class MyInterface extends CGFinterface {
 		// the identifier 'doSomething' must be a function declared as part of that object (i.e. a member of the scene class)
 		// e.g. LightingScene.prototype.doSomething = function () { console.log("Doing something..."); }; 
 
-		this.gui.add(this.scene, 'doSomething');	
+		this.gui.add(this.scene, 'doSomething');
 
 		// add a group of controls (and open/expand by defult)
 
-		var group=this.gui.addFolder("Options");
-		group.open();
+		var geral = this.gui.addFolder("Geral");
+		var luzes = this.gui.addFolder("Luzes");
+		geral.open();
 
 		// add two check boxes to the group. The identifiers must be members variables of the scene initialized in scene.init as boolean
 		// e.g. this.option1=true; this.option2=false;
 
-		group.add(this.scene, 'option1');
-		group.add(this.scene, 'option2');
+		geral.add(this.scene, 'Eixos');
+		geral.add(this.scene, 'Velocidade', -5, 5).step(1);
+		
+		luzes.add(this.scene, 'Luz 1');
+		luzes.add(this.scene, 'Luz 2');
+		luzes.add(this.scene, 'Luz 3');
+		luzes.add(this.scene, 'Luz 4');
 
-		// add a slider
-		// must be a numeric variable of the scene, initialized in scene.init e.g.
-		// this.speed=3;
-		// min and max values can be specified as parameters
-
-		this.gui.add(this.scene, 'speed', -5, 5);
-
+		initKeys();
+		
 		return true;
 	};
 
@@ -55,7 +56,7 @@ class MyInterface extends CGFinterface {
 	 * processKeyboard
 	 * @param event {Event}
 	 */
-	processKeyboard(event) {
+	/*processKeyboard(event) {
 		// call CGFinterface default code (omit if you want to override)
 		super.processKeyboard(event);
 
@@ -65,9 +66,51 @@ class MyInterface extends CGFinterface {
 		// for better cross-browser support, you may also check suggestions on using event.which in http://www.w3schools.com/jsref/event_key_keycode.asp
 		switch (event.keyCode)
 		{
-			case (65):	// only works for capital 'A', as it is
-				console.log("Key 'A' pressed");
+			case (37):	// LEFT key
+				console.log("Tecla LEFT pressionada");
+				
+			case (38):	// UP key
+				console.log("Tecla UP pressionada");
+				
+			case (39):	// RIGHT key
+				console.log("Tecla RIGHT pressionada");
+				
+			case (40):	// DOWN key
+				console.log("Tecla DOWN pressionada");
+				
 		};
+	};*/
+	
+	/**
+	 * initKeys
+	 */
+	initKeys() {
+		this.scene.gui=this;
+		this.processKeyboard=function(){};
+		this.activeKeys={};
+	}
+	
+	/**
+	 * processKeyDown
+	 * @param event {Event}
+	 */
+	processKeyDown(event) {
+		this.activeKeys[event.code]=true;
 	};
-};
+	
+	/**
+	 * processKeyUp
+	 * @param event {Event}
+	 */
+	processKeyUp(event) {
+		this.activeKeys[event.code]=false;
+	};
+	
+	/**
+	 * isKeyPressed
+	 * @param event {Event}
+	 */
+	isKeyPressed(keyCode) {
+		return this.activeKeys[keyCode] || false;
+	}
 
