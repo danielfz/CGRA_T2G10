@@ -35,6 +35,13 @@ class LightingScene extends CGFscene
 		this.gl.depthFunc(this.gl.LEQUAL);
 
 		this.axis = new CGFaxis(this);
+		
+		this.Eixos=true;
+		this.Velocidade=0;
+		this.Luz1=true;
+		this.Luz2=true;
+		this.Luz3=true;
+		this.Luz4=true;
 
 		// Scene elements
 		this.table = new MyTable(this);
@@ -172,8 +179,26 @@ class LightingScene extends CGFscene
 		for (var i = 0; i < this.lights.length; i++)
 			this.lights[i].update();
 	}
+	
+	doSomething() { 
+		console.log("Doing something..."); 
+	};
 
-
+	checkKeys() {
+		var text="Keys pressed: ";
+		var keysPressed=false;
+		if (this.gui.isKeyPressed("KeyW")) {
+			text+=" W ";
+			keysPressed=true;
+		}
+		if (this.gui.isKeyPressed("KeyS")) {
+			text+=" S ";
+			keysPressed=true;
+		}
+		if (keysPressed)
+			console.log(text);
+	}
+	
 	display() 
 	{
 		// ---- BEGIN Background, camera and axis setup

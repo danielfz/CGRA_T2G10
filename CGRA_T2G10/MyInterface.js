@@ -1,5 +1,4 @@
- 
-class MyInterface extends CGFinterface {
+class MyInterface extends CGFinterface {	
 
 
 	/**
@@ -42,12 +41,12 @@ class MyInterface extends CGFinterface {
 		geral.add(this.scene, 'Eixos');
 		geral.add(this.scene, 'Velocidade', -5, 5).step(1);
 		
-		luzes.add(this.scene, 'Luz 1');
-		luzes.add(this.scene, 'Luz 2');
-		luzes.add(this.scene, 'Luz 3');
-		luzes.add(this.scene, 'Luz 4');
+		luzes.add(this.scene, 'Luz1');
+		luzes.add(this.scene, 'Luz2');
+		luzes.add(this.scene, 'Luz3');
+		luzes.add(this.scene, 'Luz4');
 
-		initKeys();
+		this.initKeys();
 		
 		return true;
 	};
@@ -113,4 +112,5 @@ class MyInterface extends CGFinterface {
 	isKeyPressed(keyCode) {
 		return this.activeKeys[keyCode] || false;
 	}
+};
 
