@@ -21,6 +21,7 @@ class MyCircle extends CGFobject
 		this.indices = [];
 		this.normals = [];
         this.texCoords = [];
+        this.material = null;
 
         let z = 1.0;
 
@@ -62,7 +63,7 @@ class MyCircle extends CGFobject
             this.indices.push(FIRST+i, FIRST+i+1, CENTER);
         }
         this.indices.push(FIRST,CENTER,FIRST+this.slices-1);
-    }
+    };
 };
 
 

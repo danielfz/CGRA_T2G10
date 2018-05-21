@@ -9,7 +9,10 @@ var BOARD_B_DIVISIONS = 100;
 var ROOM_HEIGHT = 8.0;
 var ROOM_WIDTH = 15.0;
 
-let CLOCK_UPDATE_PERIOD_MS = 100;
+let UPDATE_PERIOD_MS = 100;
+
+let simTimeMs = 4*1000;
+let useSimTimeLimit = true;
 
 class LightingScene extends CGFscene 
 {
@@ -35,8 +38,7 @@ class LightingScene extends CGFscene
 		this.gl.depthFunc(this.gl.LEQUAL);
 
 		this.axis = new CGFaxis(this);
-		
-		this.Eixos=true;
+		this.axisEnabled=true;
 		this.Velocidade=0;
 		this.Luz1=true;
 		this.Luz2=true;
@@ -44,21 +46,33 @@ class LightingScene extends CGFscene
 		this.Luz4=true;
 
 		// Scene elements
-		this.table = new MyTable(this);
-		this.planeWall = new Plane(this);
-		this.quadWall = new MyQuad(this, -0.7, 1.7, -0.3, 1.3);
+        this.vehicle = new MyVehicle(this);
+        this.vehicle.setPosition(0.0, 0.0, 4.0);
+        //this.vehicle.setVelocity(2.1, 0.0, 0.0);
+        /*
+         *      0---1
+         *     /|  /|
+         *    2---3 |
+         *    | | | |
+         *    | 4-|-5
+         *    |/  |/
+         *    6---7   
+         */
+        this.obj = new MyBlock(this,
+            0.0,   1.0,   0.0,
+            1.0,   0.2,   0.0,
+            1.0,   0.3,   0.0, 
+            1.0,   0.2,   1.0,
+            0.0,   0.0,   0.0,
+            1.0,   0.0,   0.0,
+            1.0,   0.0,   1.0
+        );
 
-		this.floor = new MyQuad(this,0.0, 10.0, 0.0, 12.0);
-		
-		this.boardA = new Plane(this, BOARD_A_DIVISIONS,-0.5,1.5,0.0,1.0);
-		this.boardB = new Plane(this, BOARD_B_DIVISIONS);
-
-        this.clock = new MyClock(this,6,1);
-
-        this.globe = new MyGlobe(this,12,16);
+        this.crane = new MyCrane(this);
 
 		// Materials
 		this.materialDefault = new CGFappearance(this);
+		this.materialDefault.apply();
 		
 		this.materialA = new CGFappearance(this);
 		this.materialA.setAmbient(0.3,0.3,0.3,1);
@@ -74,47 +88,13 @@ class LightingScene extends CGFscene
 		this.materialB.setSpecular(0.8,0.8,0.8,1);	
 		this.materialB.setShininess(120);
 
-		this.materialWall = new CGFappearance(this);
-		this.materialWall.setAmbient(0.3,0.3,0.3,1);
-		this.materialWall.setDiffuse(0.6,0.6,0.6,1);
-		this.materialWall.setSpecular(0.8,0.8,0.8,1);	
-		this.materialWall.setShininess(120);
-
-		this.materialWood = new CGFappearance(this);
-		this.materialWood.setAmbient(0.5,0.3,0.2,1);
-		this.materialWood.setDiffuse(0.5,0.3,0.2,1);
-		this.materialWood.setSpecular(0.1,0.1,0.1,1);	
-		this.materialWood.setShininess(10);
-
 		this.materialSteel = new CGFappearance(this);
 		this.materialSteel.setAmbient(0.5,0.5,0.5,1);
 		this.materialSteel.setDiffuse(0.5,0.5,0.5,1);
 		this.materialSteel.setSpecular(1.0,1.0,1.0,1);	
 		this.materialSteel.setShininess(10);
 		
-		this.materialFloor = new CGFappearance(this);
-		this.materialFloor.setAmbient(0.3,0.3,0.3,1);
-		this.materialFloor.setDiffuse(0.6,0.6,0.6,1);
-		this.materialFloor.setSpecular(0.8,0.8,0.8,1);	
-		this.materialFloor.setShininess(120);
-        this.materialFloor.loadTexture("../resources/images/floor.png");
-        this.materialFloor.setTextureWrap("REPEAT");
-
-        this.windowAppearance = new CGFappearance(this);
-        this.windowAppearance.loadTexture("../resources/images/window.png");
-        this.windowAppearance.setTextureWrap('CLAMP_TO_EDGE','CLAMP_TO_EDGE');
-
-        this.slidesAppearance = new CGFappearance(this);
-        this.slidesAppearance.loadTexture("../resources/images/slides.png");
-        this.slidesAppearance.setTextureWrap('CLAMP_TO_EDGE','CLAMP_TO_EDGE');
-
-        this.boardAppearance = new CGFappearance(this);
-        this.boardAppearance.loadTexture("../resources/images/board.png");
-
-        this.lampAppearance = new CGFappearance(this);
-        this.lampAppearance.loadTexture("../resources/images/floor.png");
-
-        this.setUpdatePeriod(CLOCK_UPDATE_PERIOD_MS);
+        this.setUpdatePeriod(UPDATE_PERIOD_MS);
 	};
 
 	initCameras() 
@@ -123,7 +103,18 @@ class LightingScene extends CGFscene
 	};
 
     update(currTime) {
-        this.clock.update(currTime);
+        //this.vehicle.setAcceleration(0.0, 0.0, -this.vehicle.getPosition()[2]);
+        this.checkKeys();
+        if (useSimTimeLimit) {
+            simTimeMs -= 100;
+        } else {
+            simTimeMs = 1;
+        }
+        if (simTimeMs > 0) {
+            this.vehicle.update(currTime);
+        }
+
+        this.crane.update();
     }
 
 	initLights() 
@@ -184,19 +175,31 @@ class LightingScene extends CGFscene
 		console.log("Doing something..."); 
 	};
 
+	usarEixos(val) { 
+        this.axisEnabled = val;
+    }
+
 	checkKeys() {
-		var text="Keys pressed: ";
-		var keysPressed=false;
 		if (this.gui.isKeyPressed("KeyW")) {
-			text+=" W ";
-			keysPressed=true;
-		}
-		if (this.gui.isKeyPressed("KeyS")) {
-			text+=" S ";
-			keysPressed=true;
-		}
-		if (keysPressed)
-			console.log(text);
+            console.log("Key: Forward");
+            this.vehicle.forward();
+		} else if (this.gui.isKeyPressed("KeyS")) {
+            this.vehicle.reverse();
+		} else if (this.gui.isKeyPressed("KeyR")) {
+            this.vehicle.brakes();
+		} else {
+            this.vehicle.idle();
+        }
+
+		if (this.gui.isKeyPressed("KeyA")) {
+            console.log("Key: Steer left");
+            this.vehicle.beginSteerLeft();
+		} else if (this.gui.isKeyPressed("KeyD")) {
+            console.log("Key: Steer right");
+            this.vehicle.beginSteerRight();
+        } else {
+            this.vehicle.stopSteer();
+        }
 	}
 	
 	display() 
@@ -218,7 +221,9 @@ class LightingScene extends CGFscene
 		this.updateLights();
 
 		// Draw axis
-		this.axis.display();
+        if (this.axisEnabled) {
+            this.axis.display();
+        }
 
 		this.materialDefault.apply();
 
@@ -226,76 +231,16 @@ class LightingScene extends CGFscene
 
 		// ---- BEGIN Scene drawing section
 
-		// Floor
-        this.materialFloor.apply();
+		// Vehicle
 		this.pushMatrix();
-			this.translate(ROOM_WIDTH/2, 0, ROOM_WIDTH/2);
-			this.rotate(-90 * degToRad, 1, 0, 0);
-			this.scale(ROOM_WIDTH, ROOM_WIDTH, 0.2);
-			this.floor.display();
+          this.vehicle.display();
 		this.popMatrix();
+        
+		this.materialDefault.apply();
 
-		// Left Wall
-        this.windowAppearance.apply();
-		this.pushMatrix();
-			this.translate(0, 4, 7.5);
-			this.rotate(90 * degToRad, 0, 1, 0);
-			this.scale(ROOM_WIDTH, ROOM_HEIGHT, 0.2);
-			this.quadWall.display();
-		this.popMatrix();
+        this.obj.display();
 
-		// Plane Wall
-        this.materialWall.apply();
-		this.pushMatrix();
-			this.translate(7.5, 4, 0);
-			this.scale(ROOM_WIDTH, ROOM_HEIGHT, 0.2);
-			this.planeWall.display();
-		this.popMatrix();
-
-		// First Table
-        //this.materialWood.apply();
-		this.pushMatrix();
-			this.translate(5, 0, 8);
-			this.table.display();
-		this.popMatrix();
-
-		// Second Table
-        //this.materialWood.apply();
-		this.pushMatrix();
-			this.translate(12, 0, 8);
-			this.table.display();
-		this.popMatrix();
-
-		// Board A
-        //this.materialA.apply();
-        this.slidesAppearance.apply();
-		this.pushMatrix();
-			this.translate(4, 4.5, 0.2);
-			this.scale(BOARD_WIDTH, BOARD_HEIGHT, 1);
-			this.boardA.display();
-		this.popMatrix();
-
-		// Board B
-        //this.materialB.apply();
-        this.boardAppearance.apply();
-		this.pushMatrix();
-			this.translate(10.5, 4.5, 0.2);
-			this.scale(BOARD_WIDTH, BOARD_HEIGHT, 1);
-			this.boardB.display();
-		this.popMatrix();
-
-        // Clock
-		this.pushMatrix();
-			this.translate(ROOM_WIDTH/2, ROOM_HEIGHT-CLOCK_R, 0.0);
-            this.clock.display();
-		this.popMatrix();
-
-        // Globe
-		this.pushMatrix();
-            this.translate(6.5, 4.6, 7.5);
-            //this.rotate(-Math.PI/2.0, 1.0, 0.0, 0.0);
-            this.globe.display();
-		this.popMatrix();
+        this.crane.display();
 
 		// ---- END Scene drawing section
 	};
