@@ -39,7 +39,7 @@ class MyInterface extends CGFinterface {
 		// e.g. this.option1=true; this.option2=false;
 
 		geral.add(this.scene, 'Eixos');
-		geral.add(this.scene, 'Velocidade', -10, 10);
+		geral.add(this.scene, 'Velocidade', 0, 20).listen();
 		
 		luzes.add(this.scene, 'Luz1');
 		luzes.add(this.scene, 'Luz2');

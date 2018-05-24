@@ -184,6 +184,11 @@ class LightingScene extends CGFscene
 		}
 	}
 	
+	updateVelocitySlider()
+	{
+		this.Velocidade=this.vehicle.getVelocityValue();
+	}
+	
 	doSomething() { 
 		console.log("Doing something..."); 
 	};
@@ -228,6 +233,9 @@ class LightingScene extends CGFscene
 
 		// Update all lights used
 		this.updateLights();
+		
+		// Update the velocity slider in the GUI
+		this.updateVelocitySlider();
 
 		// Draw axis
         if (this.Eixos) this.axis.display();
