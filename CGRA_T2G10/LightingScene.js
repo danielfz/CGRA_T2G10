@@ -1,14 +1,5 @@
 var degToRad = Math.PI / 180.0;
 
-var BOARD_WIDTH = 6.0;
-var BOARD_HEIGHT = 4.0;
-
-var BOARD_A_DIVISIONS = 30;
-var BOARD_B_DIVISIONS = 100;
-
-var ROOM_HEIGHT = 8.0;
-var ROOM_WIDTH = 15.0;
-
 let UPDATE_PERIOD_MS = 100;
 
 let simTimeMs = 4*1000;
@@ -31,21 +22,38 @@ class LightingScene extends CGFscene
 
         this.enableTextures(true);
 
-		this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		this.gl.clearColor(0.529, 0.807, 0.921, 1.0);
 		this.gl.clearDepth(100.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.enable(this.gl.CULL_FACE);
 		this.gl.depthFunc(this.gl.LEQUAL);
 
 		this.axis = new CGFaxis(this);
-		this.axisEnabled=true;
+		
+		this.Eixos=true;
 		this.Velocidade=0;
 		this.Luz1=true;
 		this.Luz2=true;
 		this.Luz3=true;
 		this.Luz4=true;
+		
+		//example for nrDivs = 8 -> grid of 9x9 vertices
+		this.altimetry= [[ 4.5 , 5.0 , 4.0, 6.0, 4.5, 4.4, 4.3, 5.3, 6.0 ],
+						[ 5.0 , 1.3 , 1.2, 1.0, 1.5, 1.4, 1.3, 1.3, 4.0 ],
+						[ 5.0 , 1.2 , 0.0, 0.0, 0.0, 0.0, 0.0, 1.2, 4.0 ],
+						[ 5.0 , 1.3 , 0.0, 0.0, 0.0, 0.0, 0.0, 1.6, 4.5 ],
+						[ 6.5 , 1.5 , 0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 4.8 ],
+						[ 7.0 , 1.6 , 0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 4.0 ],
+						[ 6.6 , 1.7 , 0.0, 0.0, 0.0, 0.0, 0.0, 1.3, 4.0 ],
+						[ 6.0 , 1.3 , 1.3, 1.5, 1.5, 1.2, 1.0, 1.0, 4.0 ],
+						[ 5.5 , 5.0 , 4.0, 4.0, 4.5, 4.4, 4.3, 4.3, 5.5 ]
+						];
+		
 
 		// Scene elements
+		
+        this.terrain = new MyTerrain(this, 8, this.altimetry, 1, 0, 1, 0);
+		
         this.vehicle = new MyVehicle(this);
         this.vehicle.setPosition(0.0, 0.0, 4.0);
         //this.vehicle.setVelocity(2.1, 0.0, 0.0);
@@ -167,17 +175,18 @@ class LightingScene extends CGFscene
 
 	updateLights() 
 	{
-		for (var i = 0; i < this.lights.length; i++)
+		for (var i = 0; i < this.lights.length; i++) {
+			if (!this.Luz1 && i == 0) continue;
+			if (!this.Luz2 && i == 1) continue;
+			if (!this.Luz3 && i == 2) continue;
+			if (!this.Luz4 && i == 3) continue;
 			this.lights[i].update();
+		}
 	}
 	
 	doSomething() { 
 		console.log("Doing something..."); 
 	};
-
-	usarEixos(val) { 
-        this.axisEnabled = val;
-    }
 
 	checkKeys() {
 		if (this.gui.isKeyPressed("KeyW")) {
@@ -221,9 +230,7 @@ class LightingScene extends CGFscene
 		this.updateLights();
 
 		// Draw axis
-        if (this.axisEnabled) {
-            this.axis.display();
-        }
+        if (this.Eixos) this.axis.display();
 
 		this.materialDefault.apply();
 
@@ -231,6 +238,12 @@ class LightingScene extends CGFscene
 
 		// ---- BEGIN Scene drawing section
 
+		
+		this.pushMatrix();
+			this.rotate(-Math.PI/2.0, 1.0, 0.0, 0.0);
+			this.terrain.display();
+		this.popMatrix();
+		
 		// Vehicle
 		this.pushMatrix();
           this.vehicle.display();
