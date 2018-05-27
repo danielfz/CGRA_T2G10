@@ -38,8 +38,8 @@ class MyInterface extends CGFinterface {
 		// add two check boxes to the group. The identifiers must be members variables of the scene initialized in scene.init as boolean
 		// e.g. this.option1=true; this.option2=false;
 
-		geral.add(this.scene, 'usarEixos');
-		geral.add(this.scene, 'Velocidade', -5, 5).step(1);
+		geral.add(this.scene, 'Eixos');
+		geral.add(this.scene, 'Velocidade', 0, 20).listen();
 		
 		luzes.add(this.scene, 'Luz1');
 		luzes.add(this.scene, 'Luz2');
@@ -51,8 +51,11 @@ class MyInterface extends CGFinterface {
 		return true;
 	};
 
-    /*
-	processKeyboard(event) {
+	/**
+	 * processKeyboard
+	 * @param event {Event}
+	 */
+	/*processKeyboard(event) {
 		// call CGFinterface default code (omit if you want to override)
 		super.processKeyboard(event);
 
@@ -64,23 +67,18 @@ class MyInterface extends CGFinterface {
 		{
 			case (37):	// LEFT key
 				console.log("Tecla LEFT pressionada");
-                break;
 				
 			case (38):	// UP key
 				console.log("Tecla UP pressionada");
-                break;
 				
 			case (39):	// RIGHT key
 				console.log("Tecla RIGHT pressionada");
-                break;
 				
 			case (40):	// DOWN key
 				console.log("Tecla DOWN pressionada");
-                break;
 				
 		};
-	};
-    */
+	};*/
 	
 	/**
 	 * initKeys

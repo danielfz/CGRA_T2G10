@@ -30,7 +30,7 @@ class MyCrane extends CGFobject
         this.lastTime = null;
         this.finishedSwitch = true;
 
-        this.angle_bot_updown = new Animation(Math.PI/10, Math.PI/10, 2.0);
+        this.angle_bot_updown = new Animation(Math.PI/3, Math.PI/8, 2.0);
         this.angle_top_updown = new Animation(Math.PI/3, Math.PI/2, 2.0);
         this.angle_leftright = new Animation(0.0, Math.PI, 2.0);
 
@@ -145,6 +145,8 @@ class MyCrane extends CGFobject
         this.angle_bot_updown.update(dt);
         this.angle_top_updown.update(dt);
         this.angle_leftright.update(dt);
+
+        this.getMagnetPosition();
     }
 
     switchState() {
@@ -160,6 +162,21 @@ class MyCrane extends CGFobject
     }
 
     getMagnetPosition() {
+        let a1 = this.angle_bot_updown.getVal();
+        let z1 = BOT_ARM_HEIGHT*Math.cos(a1);
+        let r1 = BOT_ARM_HEIGHT*Math.cos(a1);
+        let a2 = this.angle_leftright.getVal() - Math.PI/2;
+        let x1 = r1*Math.cos(a1);
+        let y1 = r1*Math.sin(a1);
+
+        let a3 = a1 + this.angle_top_updown.getVal();
+        let z2 = TOP_ARM_HEIGHT*Math.cos(a3);
+        let r2 = TOP_ARM_HEIGHT*Math.sin(a3);
+        let x2 = r2*Math.cos(a3);
+        let y2 = r2*Math.sin(a3);
+        
+        let v = [x1+x2, y1+y2, z1+z2];
+        console.log(x1);
     }
 }
 

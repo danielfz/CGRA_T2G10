@@ -1,21 +1,25 @@
-
-/** Represents a plane with nrDivs divisions along both axis, with center at (0,0) */
-class Plane extends CGFobject{
-
-	constructor(scene, nrDivs, minS,maxS,minT,maxT) 
+/**
+ * MyTerrain
+ * @constructor
+ */
+class MyTerrain extends CGFobject
+{
+	constructor(scene, nrDivs, altimetry, minS, maxS, minT, maxT)
 	{
 		super(scene);
-
-		// nrDivs = 1 if not provided
-		nrDivs = typeof nrDivs !== 'undefined' ? nrDivs : 1;
-
-		this.nrDivs = nrDivs;
-		this.patchLength = 1.0 / nrDivs;
-
-        this.minS = minS || 0.0;
-        this.maxS = maxS || 1.0;
+		
+		this.nrDivs = nrDivs || 1;
+		this.patchLength = 10;
+		
+		this.altimetry = altimetry;
+		
+		this.minS = minS || 0.0;
+        this.maxS = maxS || 10.0;
         this.minT = minT || 0.0;
-        this.maxT = maxT || 1.0;
+        this.maxT = maxT || 10.0;
+		
+		this.terrainAppearance = new CGFappearance(scene);
+		this.terrainAppearance.loadTexture("../resources/images/terreno.png");
 
 		this.initBuffers();
 	};
@@ -45,22 +49,17 @@ class Plane extends CGFobject{
 		// Uncomment below to init texCoords
 		this.texCoords = [];
 
-		var yCoord = 0.5;
+		var yCoord = (this.patchLength*this.nrDivs)/2;
         var tCoord = this.minT;
         var ds = (this.maxS-this.minS)/this.nrDivs;
         var dt = (this.maxT-this.minT)/this.nrDivs;
 
-		for (var j = 0; j <= this.nrDivs; j++) 
-		{
+		for (var j = 0; j <= this.nrDivs; j++) {
             var sCoord = this.minS;
-			var xCoord = -0.5;
-			for (var i = 0; i <= this.nrDivs; i++) 
-			{
-				this.vertices.push(xCoord, yCoord, 0);
+			var xCoord = -((this.patchLength*this.nrDivs)/2);
+			for (var i = 0; i <= this.nrDivs; i++) {
+				this.vertices.push(xCoord, yCoord, this.altimetry[j][i]);
 				
-				// As this plane is being drawn on the xy plane, the normal to
-                // the plane will be along the positive z axis.
-				// So all the vertices will have the same normal, (0, 0, 1).
 				this.normals.push(0,0,1);
 
 				// texCoords should be computed here; uncomment and fill the blanks
@@ -127,5 +126,4 @@ class Plane extends CGFobject{
 
 		this.initGLBuffers();
 	};
-
 };

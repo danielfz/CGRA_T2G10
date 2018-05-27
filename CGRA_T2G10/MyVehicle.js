@@ -7,7 +7,7 @@ let HALFPI = Math.PI/2.0;
 let VEHICLE_MASS = 1800;
 let VEHICLE_ROTATIONAL_INERTIA = 1800;
 let ENGINE_FORWARD_FORCE = 5000;
-let ENGINE_REVERSE_FORCE = 2000;
+let ENGINE_REVERSE_FORCE = 3000;
 
 let BODY_FLOOR_DIST = 0.2;
 let BODY1_HEIGHT = 0.6;
@@ -187,10 +187,11 @@ class MyWheel extends CGFobject {
 
 class MyVehicleBody extends CGFobject
 {
-    constructor(scene) 
+    constructor(scene,right) 
     {
         super(scene);
         this.P = 0;
+        this.right = right;
         this.initBuffers();
     }
 
@@ -226,7 +227,7 @@ class MyVehicleBody extends CGFobject
     addPoint(x,y,z) {
         this.vertices.push((x-558)/126, -1.0*(y-660)/126, (z-697)/126);
         let I = 3*this.P;
-        console.log(this.vertices[I] + ", " + this.vertices[I+1] + ", " + this.vertices[I+2]);
+        //console.log(this.vertices[I] + ", " + this.vertices[I+1] + ", " + this.vertices[I+2]);
         this.P += 1;
         return this.P-1;
     }
@@ -465,6 +466,17 @@ class MyVehicleBody extends CGFobject
             638, 550, 931,     // 5
         );
 
+        if (this.right) {
+            for (let i = 0; i < this.vertices.length; i += 3) {
+                this.vertices[i] *= -1;
+            }
+            for (let i = 0; i < this.indices.length; i += 3) {
+                let temp = this.indices[i];
+                this.indices[i] = this.indices[i+1];
+                this.indices[i+1] = temp;
+            }
+        }
+
 		this.primitiveType = this.scene.gl.TRIANGLES;
 		this.initGLBuffers();
     }
@@ -479,7 +491,7 @@ class MyVehicle extends CGFobject
     constructor(scene) 
     {
         super(scene);
-        this.p = [0.0, 0.0, 0.0];
+        this.p = [30.0, 10.0, 10.0];
         this.v = [0.0, 0.0, 0.0];
         this.a = [0.0, 0.0, 0.0];
         this.angle = Math.PI/2;
@@ -488,10 +500,12 @@ class MyVehicle extends CGFobject
         this.rotInercia = VEHICLE_ROTATIONAL_INERTIA;
         this.omega = 0.0;
         this.engine = 0;
+        this.isGrabbed = false;
 
         this.body1 = new MyUnitCubeQuad(this.scene);
         this.body2 = new MyUnitCubeQuad(this.scene);
-        this.body3 = new MyVehicleBody(this.scene);
+        this.body3 = new MyVehicleBody(this.scene,true);
+        this.body4 = new MyVehicleBody(this.scene,false);
         this.wheel_FR = new MyWheel(this.scene, this, -BODY1_WIDTH/2.0,  0.0,  BODY1_LENGTH/3.0, false);
         this.wheel_FL = new MyWheel(this.scene, this,  BODY1_WIDTH/2.0,  0.0,  BODY1_LENGTH/3.0, false);
         this.wheel_RR = new MyWheel(this.scene, this, -BODY1_WIDTH/2.0,  0.0, -BODY1_LENGTH/3.0, true);
@@ -510,6 +524,7 @@ class MyVehicle extends CGFobject
             this.scene.translate(0.0, BODY_FLOOR_DIST, 0.0);
 
             this.body3.display();
+            this.body4.display();
 
             this.scene.pushMatrix();
               this.scene.translate(0.0, BODY1_HEIGHT/2.0, 0.0);
@@ -561,6 +576,10 @@ class MyVehicle extends CGFobject
         let delta = currTime - this.lastTime;
         this.lastTime = currTime;
         let dt = delta/1000.0;
+
+        if (this.isGrabbed) {
+            return;
+        }
 
         this.wheel_FL.updateTotalVelocity();
         this.wheel_FR.updateTotalVelocity();
@@ -640,5 +659,7 @@ class MyVehicle extends CGFobject
     reverse() { this.engine = ENGINE_REVERSE; }
     idle()    { this.engine = ENGINE_IDLE; }
     brakes()  { this.engine = ENGINE_BREAK; }
+
+    setGrabbed(val) { this.isGrabbed = val; }
 };
 
