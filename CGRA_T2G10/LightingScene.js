@@ -11,8 +11,8 @@ var ROOM_WIDTH = 15.0;
 
 let UPDATE_PERIOD_MS = 100;
 
-let simTimeMs = 4*1000;
-let useSimTimeLimit = true;
+let simTimeMs = 1*1000;
+let useSimTimeLimit = false;
 
 class LightingScene extends CGFscene 
 {
@@ -49,26 +49,9 @@ class LightingScene extends CGFscene
         this.vehicle = new MyVehicle(this);
         this.vehicle.setPosition(0.0, 0.0, 4.0);
         //this.vehicle.setVelocity(2.1, 0.0, 0.0);
-        /*
-         *      0---1
-         *     /|  /|
-         *    2---3 |
-         *    | | | |
-         *    | 4-|-5
-         *    |/  |/
-         *    6---7   
-         */
-        this.obj = new MyBlock(this,
-            0.0,   1.0,   0.0,
-            1.0,   0.2,   0.0,
-            1.0,   0.3,   0.0, 
-            1.0,   0.2,   1.0,
-            0.0,   0.0,   0.0,
-            1.0,   0.0,   0.0,
-            1.0,   0.0,   1.0
-        );
 
         this.crane = new MyCrane(this);
+        this.crane.switchState();
 
 		// Materials
 		this.materialDefault = new CGFappearance(this);
@@ -114,7 +97,7 @@ class LightingScene extends CGFscene
             this.vehicle.update(currTime);
         }
 
-        this.crane.update();
+        this.crane.update(currTime);
     }
 
 	initLights() 
@@ -238,9 +221,7 @@ class LightingScene extends CGFscene
         
 		this.materialDefault.apply();
 
-        this.obj.display();
-
-        this.crane.display();
+        //this.crane.display();
 
 		// ---- END Scene drawing section
 	};

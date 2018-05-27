@@ -17,12 +17,12 @@ class MyLamp extends CGFobject
         this.dS = this.maxS - this.minS;
         this.dT = this.maxT - this.minT;
 
-        console.log("minS: " + this.minS);
-        console.log("maxS: " + this.maxS);
-        console.log("dS: " + this.dS);
-        console.log("minT: " + this.minT);
-        console.log("maxT: " + this.maxT);
-        console.log("dT: " + this.dT);
+        //console.log("minS: " + this.minS);
+        //console.log("maxS: " + this.maxS);
+        //console.log("dS: " + this.dS);
+        //console.log("minT: " + this.minT);
+        //console.log("maxT: " + this.maxT);
+        //console.log("dT: " + this.dT);
 
         this.slices = slices;
         this.stacks = stacks;
@@ -37,14 +37,14 @@ class MyLamp extends CGFobject
 		this.normals = [];
         this.texCoords = [];
 
-        console.log("---");
+        //console.log("---");
         let z = 0;
         let dz = 1.0/this.stacks;
         for (let i = 0; i < (this.stacks+1)-1; ++i) { // 1 stack = 2 filas de pontos
             this.addCircleVerticesAndNormals(z);
             z += dz;
         }
-        console.log("---");
+        //console.log("---");
         
         for (let i = 0; i < this.stacks-1; ++i) { // 2 stacks = 1 stack no meio + topo
             this.addStackIndices(i);
@@ -57,7 +57,7 @@ class MyLamp extends CGFobject
             this.vertices.push(0.0, 0.0, this.R);
             this.normals.push(0.0, 0.0, 1.0);
             let s = this.minS + ((i+0.5)/this.slices)*this.dS;
-            console.log("# " + s);
+            //console.log("# " + s);
             this.texCoords.push(s, this.minT);
         }
         this.addLastStackIndices();
@@ -80,10 +80,13 @@ class MyLamp extends CGFobject
             this.vertices.push(R_base*cos, R_base*sin, Z);
             let s = this.minS + this.dS*(i/this.slices);
             this.texCoords.push(s, tCoord);
-            console.log("% " + s);
+            //console.log("% " + s);
 
-            let normal_Z = Math.sqrt(1-R_base*R_base*(cos*cos+sin*sin));
-            this.normals.push(cos,sin,normal_Z);
+            let normal = [R_base*cos, R_base*sin, Z];
+            normal = multVector(normal,modVector(normal));
+            //let normal_Z = Math.sqrt(1-R_base*R_base*(cos*cos+sin*sin));
+            this.normals.push(normal[0],normal[1],normal[2]);
+            //console.log(normal);
 
             theta += dtheta;
         }

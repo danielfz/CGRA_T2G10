@@ -14,15 +14,15 @@
             0.0, 1.0, 0.0, 0.5);
 		this.south = new MyLamp(this.scene,this.slices,this.stacks,
             1.0, 0.0, 1.0, 0.5);
-        this.appearance = new CGFappearance(this.scene);
-        this.appearance.loadTexture("../resources/images/world_map.jpg");
-		this.appearance.setAmbient(1.0,1.0,1.0,1);
+        //this.appearance = new CGFappearance(this.scene);
+        //this.appearance.loadTexture("../resources/images/world_map.jpg");
+		//this.appearance.setAmbient(1.0,1.0,1.0,1);
 
 	};
 
 	display() 
 	{
-        this.appearance.apply();
+        //this.appearance.apply();
 
         this.north.display();
 
@@ -32,5 +32,9 @@
           this.south.display();
         this.scene.popMatrix();
 	};
+
+    //setTexture(img) {
+    //    this.appearance.loadTexture(img);
+    //}
  };
 
